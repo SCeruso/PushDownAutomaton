@@ -4,7 +4,7 @@ public class Transition {
 
 	private String characterToRead;
 	private String stackCharToConsume;
-	private String[] stackCharsToPush;
+	private String[] stackSymbolsToPush;
 	private String originState;
 	private String destinyState;
 	
@@ -46,10 +46,10 @@ public class Transition {
 		this.stackCharToConsume = stackCharToConsume;
 	}
 	public String[] getStackCharsToPush() {
-		return stackCharsToPush;
+		return stackSymbolsToPush;
 	}
 	public void setStackCharsToPush(String[] stackCharsToPush) {
-		this.stackCharsToPush = stackCharsToPush;
+		this.stackSymbolsToPush = stackCharsToPush;
 	}
 	
 	

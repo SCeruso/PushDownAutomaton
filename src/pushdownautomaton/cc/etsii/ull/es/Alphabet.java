@@ -11,12 +11,12 @@ public class Alphabet {
 	}
 	
 	public void addElementToAlphabet(String element) {
-		if (!getAlphabet().contains(element))
+		if (!getAlphabet().contains(element) && !element.equals(PushDownAutomaton.EPSYLON))
 			getAlphabet().add(element);
 	}
 	
 	public boolean elementBelongsToAlphabet(String element){
-		return getAlphabet().contains(element);
+		return getAlphabet().contains(element) || element.equals(PushDownAutomaton.EPSYLON);
 	}
 	
 	private ArrayList<String> getAlphabet() {

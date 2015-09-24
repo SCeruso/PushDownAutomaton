@@ -6,6 +6,7 @@ import java.util.Stack;
 
 public class PushDownAutomaton {
 
+	public final static String EPSYLON = "$";
 	private HashMap<String, ArrayList<Transition>> automaton;
 	private String actualState;
 	private ArrayList<String> finalStates;
@@ -22,15 +23,25 @@ public class PushDownAutomaton {
 		setInputStringAlphabet(new Alphabet());
 		setStackAlphabet(new Alphabet());
 		setStack(new Stack<String>());
+		setStartingStackSymbol(null);
+		setStartingState(null);
 		
 	}
 
+	public boolean evaluateEntry() {
+		/*
+		 * TODO
+		 */
+		return false;
+	}
+	public boolean stateExist(String state) {
+		return getAutomaton().containsKey(state);
+	}
 	public void addState(String newState){
 		if (getAutomaton().containsKey(newState))
 			throw new IllegalArgumentException("El estado " + newState + " ya existe.");
 		else
-			getAutomaton().put(newState, new ArrayList<Transition>());
-		
+			getAutomaton().put(newState, new ArrayList<Transition>());		
 	}
 	
 	public void addFinalState(String finalState) {
@@ -54,6 +65,23 @@ public class PushDownAutomaton {
 			getStackAlphabet().addElementToAlphabet(newElement);
 	}
 	
+	public void addTransition(String origin, String entryToConsume, String stackSymbolToConsume, String destiny, String symbolsToPush)throws IllegalArgumentException {
+		if (!stateExist(origin))
+			throw new IllegalArgumentException("El elemento " + origin + " no forma parte del conjunto de estados.");
+		if (!stateExist(destiny))
+			throw new IllegalArgumentException("El elemento " + destiny + " no forma parte del conjunto de estados.");
+		if (!getInputStringAlphabet().elementBelongsToAlphabet(entryToConsume))
+			throw new IllegalArgumentException("El elemento " + entryToConsume + " no forma parte del alfabeto de entrada.");
+		if (!getStackAlphabet().elementBelongsToAlphabet(stackSymbolToConsume))
+			throw new IllegalArgumentException("El elemento " + stackSymbolToConsume + " no forma parte del alfabeto de la pila.");
+		
+		for (int i = 0; i < symbolsToPush.length(); i++) {
+			if(!getStackAlphabet().elementBelongsToAlphabet(symbolsToPush.substring(i, i + 1)))
+				throw new IllegalArgumentException("El elemento " + symbolsToPush.substring(i, i + 1) + " no forma parte del alfabeto de la pila.");	
+		}
+		
+		getAutomaton().get(origin).add(new Transition(origin, destiny, entryToConsume, stackSymbolToConsume, symbolsToPush.split("")));
+	}
 	/**
 	 **************************************** Getters y Setters.*********************
 	 */
@@ -85,7 +113,7 @@ public class PushDownAutomaton {
 		this.actualState = actualState;
 	}
 
-	private ArrayList<String> getFinalStates() {
+	public ArrayList<String> getFinalStates() {
 		return finalStates;
 	}
 
