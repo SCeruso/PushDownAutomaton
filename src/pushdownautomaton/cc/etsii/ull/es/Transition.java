@@ -1,5 +1,10 @@
 package pushdownautomaton.cc.etsii.ull.es;
-
+/**
+ * @author Sabato Ceruso.
+ * @email sab7093@gmail.com
+ * Complejidad computacional.
+ * Universidad de la Laguna, España.
+ */
 public class Transition {
 
 	private String characterToRead;
