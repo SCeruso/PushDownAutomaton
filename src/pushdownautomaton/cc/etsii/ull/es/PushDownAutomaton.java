@@ -23,27 +23,150 @@ public class PushDownAutomaton {
 	private Stack<String> stack;									// Pila del automata.
 	private InputString inputString;								// Cadena de entrada.
 	
+	/**
+	 * Crea un automata vacio.
+	 */
 	public PushDownAutomaton() {
 		setAutomaton(new HashMap<String, ArrayList<Transition>>());
 		setFinalStates(new ArrayList<String>());
 		setInputStringAlphabet(new Alphabet());
 		setStackAlphabet(new Alphabet());
 		setStack(new Stack<String>());
-		setStartingStackSymbol(null);
+		startingStackSymbol = (null);
 		setStartingState(null);
 		
+	}
+	/**
+	 * Crea un automata copiando las referencias del que se le pasa por parametro
+	 * y aplicandose una transicion.
+	 * @param other
+	 * @param transitionToApply
+	 */
+	public PushDownAutomaton(PushDownAutomaton other, Transition transitionToApply) {
+		String readSymbol;
+		String symbolsToPush[];
+		
+		this.setAutomaton(other.getAutomaton());
+		this.setFinalStates(other.getFinalStates());
+		this.setInputString(new InputString(other.getInputString()));
+		this.setStackAlphabet(other.getStackAlphabet());
+		this.startingStackSymbol = (other.getStartingStackSymbol());
+		this.startingState = (other.getStartingState());
+		this.setStack((Stack<String>)other.getStack().clone());					/// Verificar si el clone está realmente implementado.
+		this.setInputStringAlphabet(other.getInputStringAlphabet());
+		
+		if (!transitionToApply.getCharacterToRead().equals(EPSYLON))
+			readSymbol = this.getInputString().readNextElement();
+		this.getStack().pop();
+		symbolsToPush = transitionToApply.getStackCharsToPush();
+		
+		this.pushSymbolsToStack(symbolsToPush);
+		
+		this.setActualState(transitionToApply.getDestinyState());
 	}
 	/**
 	 * Evalua la entrada actual.
 	 * @return True si es aceptada.
 	 */
 	public boolean evaluateEntry() {
-		/*
-		 * TODO
-		 */
+		ArrayList<String> actualStates = new ArrayList<String>();
+		ArrayList<Transition> possibleTransitions = new ArrayList<Transition>();
+		
+		
+		///actualStates = epsylonClausure(getActualState());			MAAAAL siempre se consume un simbolo de la pila.
+		actualStates.add(actualState);
+		if (entryAccepted(actualStates))
+			return true;
+		
+		for (int i = 0; i < actualStates.size(); i++) {
+			possibleTransitions = possibleTransitions(actualStates.get(i));
+			for (int j = 0; j < possibleTransitions.size(); j++){
+				PushDownAutomaton newAutomaton = new PushDownAutomaton(this, possibleTransitions.get(j));
+			
+				if (newAutomaton.evaluateEntry())
+					return true;
+			}
+		}
+			
 		return false;
 	}
-	
+	/**
+	 * Empuja todos los simbolos a la pila.
+	 * Hay que tener cuidado con la semantica del orden en que se empujan.
+	 * @param symbols
+	 */
+	private void pushSymbolsToStack(String symbols[]) {
+		for(int i = symbols.length - 1; i >= 0; i--) {
+			if (!symbols[i].equals(EPSYLON))
+				this.getStack().push(symbols[i]);		
+		}
+	}
+	/**
+	 * Devuelve true si en el estado en el que esta
+	 * se puede dar por aceptada la entrada.
+	 * @param actualStates
+	 * @return
+	 */
+	private boolean entryAccepted(ArrayList<String> actualStates) {
+		if (getInputString().entryEnded()) {
+			if (getFinalStates().isEmpty())
+				return getStack().isEmpty();
+			else {
+				for (int i = 0; i < actualStates.size(); i++)
+					if (getFinalStates().contains(actualStates.get(i)))
+						return true;
+			}
+		}
+		return false;
+	}
+	/**
+	 * Devuelve la lista de posibles transiciones
+	 * para un determinado estado.
+	 * @param state
+	 * @return
+	 */
+	private ArrayList<Transition> possibleTransitions(String state) {
+		ArrayList<Transition> result = new ArrayList<Transition>();
+		
+		if (!getStack().isEmpty()) {
+			for (int i = 0; i < getAutomaton().get(state).size(); i++) {
+				if (getAutomaton().get(state).get(i).getCharacterToRead().equals(EPSYLON) || 
+						getAutomaton().get(state).get(i).getCharacterToRead().equals(getInputString().readNextElementWithoutAdvance()))
+						if (getAutomaton().get(state).get(i).getStackCharToConsume().equals(getStack().peek()))
+							result.add(getAutomaton().get(state).get(i));
+			}
+		}
+		return result;
+	}
+	/**
+	 * Calcula la epsylon clausura de un estado.
+	 * @param Actualstate
+	 * @return
+	 */
+	private ArrayList<String> epsylonClausure(String Actualstate) {
+		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> aux = new ArrayList<String>();
+		String state = null;
+		
+		aux.add(Actualstate);
+		
+		while (!aux.isEmpty()) {
+			state = aux.get(0);
+			aux.remove(0);
+		
+			for (int i = 0; i < getAutomaton().get(state).size(); i++) 
+				if (getAutomaton().get(state).get(i).getCharacterToRead().equals(EPSYLON) && 
+						getAutomaton().get(state).get(i).getStackCharToConsume().equals(getStack().peek())) {
+					if (!result.contains(getAutomaton().get(state).get(i).getDestinyState()))
+						aux.add(getAutomaton().get(state).get(i).getDestinyState());
+					
+				}
+			
+			result.add(state);
+		}
+		
+		return result;
+	}
 	/**
 	 * Verifica si el estado existe en el automata.
 	 * @param state
@@ -129,7 +252,7 @@ public class PushDownAutomaton {
 	public void setInputString(String input) {
 		setInputString(new InputString(input));
 	}
-	public void setInputString(InputString inputString) {
+	private void setInputString(InputString inputString) {
 		this.inputString = inputString;
 	}
 

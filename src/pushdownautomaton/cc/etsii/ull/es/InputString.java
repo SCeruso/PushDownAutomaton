@@ -23,14 +23,37 @@ public class InputString {
 		
 	}
 	/**
+	 * 
+	 * @param input
+	 */
+	public InputString(InputString input) {
+		setInputString(input.getInputString());
+		setActualIndex(input.getActualIndex());
+	}
+	/**
+	 * Verifica si se ha leido toda la cadena de entrada.
+	 * @return
+	 */
+	public boolean entryEnded() {
+		return getActualIndex() == getInputString().size();
+	}
+	/**
 	 * Lee el siguiente elemento y avanza en el índice.
 	 * @return	elemento leído, null si se ha llegado al final.
 	 */
-	public String getReadNextElement() {
+	public String readNextElement() {
 		String result = null;
 		if (getActualIndex() < getInputString().size()) {
 			result = getInputString().get(getActualIndex());
 			setActualIndex(getActualIndex() + 1);
+		}
+		return result;
+	}
+	
+	public String readNextElementWithoutAdvance() {
+		String result = null;
+		if (getActualIndex() < getInputString().size()) {
+			result = getInputString().get(getActualIndex());
 		}
 		return result;
 	}

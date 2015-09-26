@@ -193,7 +193,8 @@ public class PushDownAutomatonParser {
 				throw new ParsingException("El estado " + states[i] + " no existe.");
 			else if (emptyFound)
 				throw new ParsingException("No se puede indicar NONE si se añaden estados finales.");
-			getAutomaton().addFinalState(states[i]);
+			if (!states[i].equals(EMPTY_FINAL_STATES))
+				getAutomaton().addFinalState(states[i]);
 		}
 	
 		
